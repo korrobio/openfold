@@ -42,6 +42,7 @@ $ bash scripts/download_openfold_params.sh $PARAMS_DIR
 
 We recommend selecting `openfold/resources` as the params directory as this is the default directory used by the `run_pretrained_openfold.py` to locate parameters. 
 
+
 If you choose to use a different directory, you may make a symlink to the `openfold/resources` directory, or specify an alternate parameter path with the command line argument `--jax_param_path` for AlphaFold parameters or `--openfold_checkpoint_path` for OpenFold parameters. 
 
 
@@ -159,6 +160,7 @@ Note that chunking (as defined in section 1.11.8 of the AlphaFold 2 supplement) 
 
 #### Long sequence inference 
 To minimize memory usage during inference on long sequences, consider the following changes:
+
 
 - As noted in the AlphaFold-Multimer paper, the AlphaFold/OpenFold template stack is a major memory bottleneck for inference on long sequences. OpenFold supports two mutually exclusive inference modes to address this issue. One, `average_templates` in the `template` section of the config, is similar to the solution offered by AlphaFold-Multimer, which is simply to average individual template representations. Our version is modified slightly to accommodate weights trained using the standard template algorithm. Using said weights, we notice no significant difference in performance between our averaged template embeddings and the standard ones. The second, `offload_templates`, temporarily offloads individual template embeddings into CPU memory. The former is an approximation while the latter is slightly slower; both are memory-efficient and allow the model to utilize arbitrarily many templates across sequence lengths. Both are disabled by default, and it is up to the user to determine which best suits their needs, if either.
 - Inference-time low-memory attention (LMA) can be enabled in the model config. This setting trades off speed for vastly improved memory usage. By default, LMA is run with query and key chunk sizes of 1024 and 4096, respectively. These represent a favorable tradeoff in most memory-constrained cases. Powerusers can choose to tweak these settings in `openfold/model/primitives.py`. For more information on the LMA algorithm, see the aforementioned Staats & Rabe preprint.
